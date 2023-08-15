@@ -1,71 +1,39 @@
-import { Action, ActionPanel, Icon, List } from "@raycast/api";
+import { List } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { runAppleScript } from "run-applescript";
-import { getDeviceIcon } from "./utils/getDeviceIcon";
-
-interface Device {}
-
-async function getDevices(platform = "ios") {
-  const devices = await runAppleScript(`
-    tell application "MiniSim"
-        getDevices platform "${platform}"
-    end tell
-  `);
-  return JSON.parse(devices);
-}
+import { Command, Device, Platform } from "./types";
+import { getCommands, getDevices } from "./actions";
+import { sortDevices } from "./utils";
+import DeviceList from "./DeviceList";
 
 export default function Command() {
-  const [androidDevices, setAndroidDevices] = useState([]);
-  const [iosDevices, setIOSDevices] = useState([]);
+  const [androidDevices, setAndroidDevices] = useState<Device[]>([]);
+  const [iosDevices, setIOSDevices] = useState<Device[]>([]);
+  const [androidCommands, setAndroidCommands] = useState<Command[]>([]);
+  const [iosCommands, setIOSComands] = useState<Command[]>([]);
+
+  const isLoading = androidDevices.length === 0 && iosDevices.length === 0;
 
   useEffect(() => {
-    getDevices("ios").then(setIOSDevices);
-    getDevices("android").then(setAndroidDevices);
+    const fetchDevices = async () => {
+      const [iosDevices, androidDevices, iosCommands, androidCommands] = await Promise.all([
+        getDevices(Platform.ios),
+        getDevices(Platform.android),
+        getCommands(Platform.ios),
+        getCommands(Platform.android),
+      ]);
+      setIOSDevices(iosDevices?.sort(sortDevices));
+      setAndroidDevices(androidDevices?.sort(sortDevices));
+      setIOSComands(iosCommands);
+      setAndroidCommands(androidCommands);
+    };
+
+    fetchDevices().catch(console.error);
   }, []);
 
-  console.log(iosDevices);
-
   return (
-    <List>
-      <List.Section title="iOS">
-        {iosDevices?.map(({ name, ID }) => (
-          <List.Item
-            key={ID}
-            title={name}
-            icon={getDeviceIcon(name)}
-            actions={
-              <ActionPanel>
-                <Action
-                  icon={Icon.Trash}
-                  title="Delete Simulator"
-                  onAction={() => {
-                    console.log("delete");
-                  }}
-                />
-              </ActionPanel>
-            }
-          />
-        ))}
-      </List.Section>
-      <List.Section title="Android">
-        {androidDevices?.map(({ name }) => (
-          <List.Item
-            key={name}
-            title={name}
-            icon={getDeviceIcon(name)}
-            actions={
-              <ActionPanel>
-                <Action
-                  title="Delete Simulator"
-                  onAction={() => {
-                    console.log("delete");
-                  }}
-                />
-              </ActionPanel>
-            }
-          />
-        ))}
-      </List.Section>
+    <List isLoading={isLoading}>
+      <DeviceList name="Android" platform={Platform.android} devices={androidDevices} commands={androidCommands} />
+      <DeviceList name="iOS" platform={Platform.ios} devices={iosDevices} commands={iosCommands} />
     </List>
   );
 }
