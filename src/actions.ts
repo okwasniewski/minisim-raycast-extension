@@ -18,7 +18,7 @@ export async function launchDevice(deviceName: string) {
     `);
 }
 
-export async function getCommands(platform: Platform) {
+export async function getCommands(platform: Platform): Promise<Command[]> {
   const commands = await runAppleScript(`
     tell application "MiniSim"
         getCommands platform "${platform}"

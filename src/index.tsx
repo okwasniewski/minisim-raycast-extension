@@ -1,34 +1,13 @@
 import { List } from "@raycast/api";
-import { useEffect, useState } from "react";
-import { Command, Device, Platform } from "./types";
-import { getCommands, getDevices } from "./actions";
-import { sortDevices } from "./utils";
+import { Command, Platform } from "./types";
 import DeviceList from "./DeviceList";
+import useDevices from "./useDevices";
 
 export default function Command() {
-  const [androidDevices, setAndroidDevices] = useState<Device[]>([]);
-  const [iosDevices, setIOSDevices] = useState<Device[]>([]);
-  const [androidCommands, setAndroidCommands] = useState<Command[]>([]);
-  const [iosCommands, setIOSComands] = useState<Command[]>([]);
+  const { devices: iosDevices, commands: iosCommands } = useDevices(Platform.ios);
+  const { devices: androidDevices, commands: androidCommands } = useDevices(Platform.android);
 
   const isLoading = androidDevices.length === 0 && iosDevices.length === 0;
-
-  useEffect(() => {
-    const fetchDevices = async () => {
-      const [iosDevices, androidDevices, iosCommands, androidCommands] = await Promise.all([
-        getDevices(Platform.ios),
-        getDevices(Platform.android),
-        getCommands(Platform.ios),
-        getCommands(Platform.android),
-      ]);
-      setIOSDevices(iosDevices?.sort(sortDevices));
-      setAndroidDevices(androidDevices?.sort(sortDevices));
-      setIOSComands(iosCommands);
-      setAndroidCommands(androidCommands);
-    };
-
-    fetchDevices().catch(console.error);
-  }, []);
 
   return (
     <List isLoading={isLoading}>

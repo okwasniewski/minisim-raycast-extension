@@ -1,8 +1,7 @@
-import { Action, ActionPanel, Icon, List, closeMainWindow } from "@raycast/api";
+import { Action, ActionPanel, Icon, List, closeMainWindow, showHUD } from "@raycast/api";
 import { Command, Device, Platform } from "./types";
 import { getDeviceIcon } from "./utils";
 import { executeCommand, launchDevice } from "./actions";
-
 interface Props {
   name: string;
   platform: Platform;
@@ -42,6 +41,7 @@ const DeviceList = ({ commands, devices, name, platform }: Props) => {
                     title={command.name}
                     onAction={() => {
                       executeCommand(command, name, ID ?? "");
+                      showHUD(`${command.name} ✅`);
                       closeMainWindow();
                     }}
                   />
