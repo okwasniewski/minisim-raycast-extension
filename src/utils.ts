@@ -1,19 +1,29 @@
+import { environment } from "@raycast/api";
 import { Device } from "./types";
 
+function getIconName(name: string) {
+  const isDarkMode = environment.appearance === "dark";
+  return `${name}${isDarkMode ? "_dark" : ""}.png`;
+}
+
 export function getDeviceIcon(deviceName: string) {
-  if (deviceName.includes("Apple TV") || deviceName.includes("TV")) {
-    return "appletv.fill.png";
+  if (deviceName.includes("Apple TV")) {
+    return getIconName("appletv.fill");
+  }
+
+  if (deviceName.includes("TV")) {
+    return getIconName("tv");
   }
 
   if (deviceName.includes("iPad") || deviceName.includes("Tablet")) {
-    return "ipad.landscape.png";
+    return getIconName("ipad.landscape");
   }
 
   if (deviceName.includes("Watch")) {
-    return "applewatch.png";
+    return getIconName("applewatch");
   }
 
-  return "iphone.png";
+  return getIconName("iphone");
 }
 
 export function sortDevices(a: Device, b: Device) {
