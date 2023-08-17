@@ -7,6 +7,7 @@ import { LocalStorage } from "@raycast/api";
 const useDevices = (platform: Platform) => {
   const [devices, setDevices] = useState<Device[]>([]);
   const [commands, setCommands] = useState<Command[]>([]);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -20,21 +21,18 @@ const useDevices = (platform: Platform) => {
       }
       const [newDevices, newCommands] = await Promise.all([getDevices(platform), getCommands(platform)]);
 
-      if (
-        cachedDevices?.length == 0 ||
-        cachedDevices?.length !== newDevices.length ||
-        cachedCommands?.length !== newCommands.length
-      ) {
-        setDevices(newDevices?.sort(sortDevices));
-        setCommands(newCommands);
-        LocalStorage.setItem(platform, JSON.stringify({ devices: newDevices, commands: newCommands }));
-      }
+      setDevices(newDevices?.sort(sortDevices));
+      setCommands(newCommands);
+      LocalStorage.setItem(platform, JSON.stringify({ devices: newDevices, commands: newCommands }));
     };
 
-    fetchDevices().catch(console.error);
+    fetchDevices().catch((e) => {
+      console.error(e);
+      setIsError(true);
+    });
   }, []);
 
-  return { devices, commands };
+  return { devices, commands, isError };
 };
 
 export default useDevices;
