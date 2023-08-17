@@ -14,7 +14,13 @@
     {
       "name": "index",
       "title": "Show Devices",
-      "keywords": ["Android", "iOS", "Simulator", "Emulator", "MiniSim"],
+      "keywords": [
+        "Android",
+        "iOS",
+        "Simulator",
+        "Emulator",
+        "MiniSim"
+      ],
       "description": "Show available devices.",
       "mode": "view"
     }
@@ -37,5 +43,6 @@
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
     "publish": "npx @raycast/api@latest publish"
-  }
+  },
+  "version": "1.0.0"
 }

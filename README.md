@@ -1,3 +1,3 @@
-# MiniSim
+# MiniSim Raycast Extension
 
-Extension for MiniSim
+This extension allows to easily manage [MiniSim](https://minisim.app) from Raycast.
